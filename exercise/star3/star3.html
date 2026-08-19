@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷的星空背景粒子动画 - 每天一个CSS小样式</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000010;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 星空背景 */
+        .stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(41, 128, 185, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(155, 89, 182, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(192, 57, 43, 0.1) 0%, transparent 50%),
+                linear-gradient(to bottom, #000010, #000030, #000020);
+        }
+
+        /* 星星层 */
+        .stars-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        /* 星星 */
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        /* 大星星 */
+        .star.large {
+            width: 4px;
+            height: 4px;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: twinkle-large 5s infinite alternate;
+        }
+
+        /* 中等星星 */
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+            animation: twinkle-medium 4s infinite alternate;
+        }
+
+        /* 小星星 */
+        .star.small {
+            width: 1px;
+            height: 1px;
+            box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4);
+            animation: twinkle-small 3s infinite alternate;
+        }
+
+        /* 流星 */
+        .shooting-star {
+            position: fixed;
+            top: 0;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0;
+        }
+
+        /* 流星轨迹 */
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(173, 216, 230, 0) 0%, rgba(173, 216, 230, 0.8) 50%, rgba(173, 216, 230, 0) 100%);
+            filter: blur(5px);
+            border-radius: 50%;
+        }
+
+        /* 星系 */
+        .galaxy {
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .galaxy-1 {
+            width: 500px;
+            height: 500px;
+            top: 10%;
+            left: 5%;
+            background: radial-gradient(circle, rgba(142, 68, 173, 0.2) 0%, transparent 70%);
+            animation: rotate-clockwise 120s infinite linear;
+        }
+
+        .galaxy-2 {
+            width: 300px;
+            height: 300px;
+            bottom: 10%;
+            right: 10%;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.2) 0%, transparent 70%);
+            animation: rotate-counterclockwise 100s infinite linear;
+        }
+
+        /* 行星 */
+        .planet {
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .planet-1 {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            right: 15%;
+            background: radial-gradient(circle at 30% 30%, #e74c3c, #c0392b);
+            box-shadow: 0 0 50px rgba(231, 76, 60, 0.5);
+            animation: float-planet-1 20s infinite ease-in-out;
+        }
+
+        .planet-2 {
+            width: 60px;
+            height: 60px;
+            bottom: 25%;
+            left: 15%;
+            background: radial-gradient(circle at 30% 30%, #3498db, #2980b9);
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.5);
+            animation: float-planet-2 15s infinite ease-in-out;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-top: 30px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, #3498db, #9b59b6, #e74c3c, #f1c40f);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: cosmic-title 8s ease infinite;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #a0c8ff;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 卡片区域 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .cosmic-card {
+            background: rgba(10, 20, 40, 0.6);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cosmic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg,
+                    transparent 30%,
+                    rgba(52, 152, 219, 0.1) 50%,
+                    transparent 70%);
+            background-size: 300% 300%;
+            animation: card-shine 8s infinite linear;
+            z-index: 0;
+        }
+
+        .cosmic-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 10, 30, 0.7);
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: #5dade2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .card-title i {
+            font-size: 1.4rem;
+        }
+
+        .card-desc {
+            color: #b0d0ff;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* 控制面板 */
+        .control-panel {
+            background: rgba(10, 20, 40, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel h2 {
+            color: #9b59b6;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            color: #a0c8ff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(20, 40, 80, 0.8);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+        }
+
+        .control-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #9b59b6;
+        }
+
+        .value-display {
+            color: #5dade2;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* 动画定义 */
+        @keyframes cosmic-title {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes twinkle-large {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            }
+
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 20px 4px rgba(255, 255, 255, 1);
+            }
+        }
+
+        @keyframes twinkle-medium {
+
+            0%,
+            100% {
+                opacity: 0.4;
+                box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+            }
+
+            50% {
+                opacity: 0.9;
+                box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.9);
+            }
+        }
+
+        @keyframes twinkle-small {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4);
+            }
+
+            50% {
+                opacity: 0.7;
+                box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.7);
+            }
+        }
+
+        @keyframes shooting-star {
+            0% {
+                opacity: 0;
+                transform: translateX(0) translateY(0) rotate(45deg);
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(1000px) translateY(500px) rotate(45deg);
+            }
+        }
+
+        @keyframes rotate-clockwise {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotate-counterclockwise {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
+
+        @keyframes float-planet-1 {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            25% {
+                transform: translateY(-30px) translateX(20px);
+            }
+
+            50% {
+                transform: translateY(0) translateX(40px);
+            }
+
+            75% {
+                transform: translateY(30px) translateX(20px);
+            }
+        }
+
+        @keyframes float-planet-2 {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            33% {
+                transform: translateY(-20px) translateX(-20px);
+            }
+
+            66% {
+                transform: translateY(20px) translateX(20px);
+            }
+        }
+
+        @keyframes card-shine {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 300% 300%;
+            }
+        }
+
+        /* 代码展示区域 */
+        .code-block {
+            background: rgba(10, 20, 40, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-left: 5px solid #e74c3c;
+            backdrop-filter: blur(10px);
+        }
+
+        .code-block h2 {
+            color: #e74c3c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+        }
+
+        .code-block pre {
+            color: #c5c8d3;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            background: rgba(5, 10, 20, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* 底部区域 */
+        .footer {
+            text-align: center;
+            color: #7070a0;
+            font-size: 0.9rem;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .planet-1,
+            .planet-2 {
+                display: none;
+                /* 在小屏幕上隐藏行星以提升性能 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 星空背景 -->
+    <div class="stars-bg"></div>
+    <div class="stars-layer" id="stars-layer"></div>
+
+    <!-- 星系和行星 -->
+    <div class="galaxy galaxy-1"></div>
+    <div class="galaxy galaxy-2"></div>
+    <div class="planet planet-1"></div>
+    <div class="planet planet-2"></div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-star"></i> 星空粒子动画</h1>
+            <p class="subtitle">今日主题：炫酷的星空背景粒子动画 - 使用CSS动画、渐变和伪元素模拟宇宙中的星星、流星和星系，创建一个沉浸式的星空场景</p>
+        </div>
+
+        <div class="cards-container">
+            <div class="cosmic-card">
+                <h3 class="card-title"><i class="fas fa-meteor"></i> 流星效果</h3>
+                <p class="card-desc">流星随机划过夜空，留下美丽的光迹。每颗流星都有不同的轨迹和速度，模拟真实的流星雨效果。</p>
+                <div class="value-display">当前流星数量: <span id="meteor-count">0</span></div>
+            </div>
+
+            <div class="cosmic-card">
+                <h3 class="card-title"><i class="fas fa-stars"></i> 星星闪烁</h3>
+                <p class="card-desc">三种不同大小的星星以不同频率闪烁，创造出生动逼真的星空效果。大星星闪烁较慢，小星星闪烁较快。</p>
+                <div class="value-display">星星总数: <span id="star-count">0</span></div>
+            </div>
+
+            <div class="cosmic-card">
+                <h3 class="card-title"><i class="fas fa-globe-americas"></i> 星系与行星</h3>
+                <p class="card-desc">旋转的星系和漂浮的行星为星空增添了深度和动感。星系以不同的方向和速度旋转，行星则漂浮运动。</p>
+                <div class="value-display">星系/行星: <span id="galaxy-count">4</span></div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <h2><i class="fas fa-sliders-h"></i> 星空控制面板</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="star-density"><i class="fas fa-star-half-alt"></i> 星星密度</label>
+                    <input type="range" id="star-density" min="10" max="200" value="100">
+                    <div class="value-display">密度: <span id="density-value">100</span></div>
+                </div>
+
+                <div class="control-group">
+                    <label for="meteor-frequency"><i class="fas fa-bolt"></i> 流星频率</label>
+                    <input type="range" id="meteor-frequency" min="1" max="20" value="5">
+                    <div class="value-display">频率: <span id="frequency-value">5</span> (颗/分钟)</div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twinkle-speed"><i class="fas fa-tachometer-alt"></i> 闪烁速度</label>
+                    <input type="range" id="twinkle-speed" min="1" max="10" value="5">
+                    <div class="value-display">速度: <span id="speed-value">5</span></div>
+                </div>
+
+                <div class="control-group">
+                    <label for="galaxy-toggle"><i class="fas fa-galaxy"></i> 显示星系</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="galaxy-toggle" checked>
+                        <span class="value-display" id="galaxy-status">开启</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="planet-toggle"><i class="fas fa-globe"></i> 显示行星</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="planet-toggle" checked>
+                        <span class="value-display" id="planet-status">开启</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <button id="reset-btn" class="cosmic-card"
+                        style="padding: 12px 20px; cursor: pointer; border: none; background: rgba(52, 152, 219, 0.3); color: white; font-weight: bold;">
+                        <i class="fas fa-redo"></i> 重置星空
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <h2><i class="fas fa-code"></i> 核心CSS代码</h2>
+            <pre><code>
+/* 星星基础样式 */
+.star {
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+}
+
+/* 大星星闪烁动画 */
+.star.large {
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+    animation: twinkle-large 5s infinite alternate;
+}
+
+/* 中等星星闪烁动画 */
+.star.medium {
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+    animation: twinkle-medium 4s infinite alternate;
+}
+
+/* 小星星闪烁动画 */
+.star.small {
+    width: 1px;
+    height: 1px;
+    box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4);
+    animation: twinkle-small 3s infinite alternate;
+}
+
+/* 流星样式 */
+.shooting-star {
+    position: fixed;
+    top: 0;
+    width: 150px;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,1) 70%, 
+        rgba(255,255,255,0) 100%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+}
+
+/* 流星轨迹 */
+.shooting-star::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(173,216,230,0) 0%, 
+        rgba(173,216,230,0.8) 50%, 
+        rgba(173,216,230,0) 100%);
+    filter: blur(5px);
+    border-radius: 50%;
+}
+
+/* 流星动画 */
+@keyframes shooting-star {
+    0% {
+        opacity: 0;
+        transform: translateX(0) translateY(0) rotate(45deg);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(1000px) translateY(500px) rotate(45deg);
+    }
+}
+
+/* 星系旋转动画 */
+@keyframes rotate-clockwise {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotate-counterclockwise {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+/* 行星浮动动画 */
+@keyframes float-planet-1 {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    25% {
+        transform: translateY(-30px) translateX(20px);
+    }
+    50% {
+        transform: translateY(0) translateX(40px);
+    }
+    75% {
+        transform: translateY(30px) translateX(20px);
+    }
+}
+            </code></pre>
+        </div>
+
+        <div class="footer">
+            <p>每天一个CSS小样式 | 炫酷的星空背景粒子动画</p>
+            <p>使用纯CSS动画和JavaScript交互，无需外部库</p>
+            <p>提示：点击屏幕任意位置可以添加自定义星星！</p>
+        </div>
+    </div>
+
+    <script>
+        // 星星数组
+        let stars = [];
+        let shootingStars = [];
+
+        // DOM元素
+        const starsLayer = document.getElementById('stars-layer');
+        const starCountElement = document.getElementById('star-count');
+        const meteorCountElement = document.getElementById('meteor-count');
+
+        // 控制元素
+        const starDensitySlider = document.getElementById('star-density');
+        const densityValue = document.getElementById('density-value');
+        const meteorFrequencySlider = document.getElementById('meteor-frequency');
+        const frequencyValue = document.getElementById('frequency-value');
+        const twinkleSpeedSlider = document.getElementById('twinkle-speed');
+        const speedValue = document.getElementById('speed-value');
+        const galaxyToggle = document.getElementById('galaxy-toggle');
+        const galaxyStatus = document.getElementById('galaxy-status');
+        const planetToggle = document.getElementById('planet-toggle');
+        const planetStatus = document.getElementById('planet-status');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // 初始化参数
+        let starDensity = parseInt(starDensitySlider.value);
+        let meteorFrequency = parseInt(meteorFrequencySlider.value);
+        let twinkleSpeed = parseInt(twinkleSpeedSlider.value);
+        let meteorsActive = true;
+
+        // 初始化星星
+        function initStars() {
+            // 清除现有星星
+            starsLayer.innerHTML = '';
+            stars = [];
+
+            // 根据密度创建星星
+            const starCount = Math.floor(starDensity * 2.5); // 每单位密度创建2.5颗星星
+
+            for (let i = 0; i < starCount; i++) {
+                createStar();
+            }
+
+            starCountElement.textContent = starCount;
+        }
+
+        // 创建单个星星
+        function createStar() {
+            const star = document.createElement('div');
+            star.className = 'star';
+
+            // 随机大小
+            const sizeType = Math.random();
+            if (sizeType < 0.1) {
+                star.classList.add('large');
+            } else if (sizeType < 0.4) {
+                star.classList.add('medium');
+            } else {
+                star.classList.add('small');
+            }
+
+            // 随机位置
+            const left = Math.random() * 100;
+            const top = Math.random() * 100;
+            star.style.left = `${left}%`;
+            star.style.top = `${top}%`;
+
+            // 随机动画延迟
+            const delay = Math.random() * 5;
+            star.style.animationDelay = `${delay}s`;
+
+            // 应用闪烁速度
+            updateStarAnimationSpeed(star);
+
+            starsLayer.appendChild(star);
+            stars.push(star);
+
+            return star;
+        }
+
+        // 更新星星动画速度
+        function updateStarAnimationSpeed(star) {
+            const baseDuration = parseFloat(getComputedStyle(star).animationDuration);
+            const newDuration = (6 - twinkleSpeed * 0.5) * (baseDuration / 5);
+            star.style.animationDuration = `${newDuration}s`;
+        }
+
+        // 创建流星
+        function createShootingStar() {
+            if (!meteorsActive) return;
+
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'shooting-star';
+
+            // 随机起始位置和角度
+            const startX = Math.random() * window.innerWidth * 0.5;
+            const startY = Math.random() * window.innerHeight * 0.3;
+            const angle = 20 + Math.random() * 25; // 20-45度角
+
+            // 随机长度和速度
+            const length = 100 + Math.random() * 200;
+            const duration = 1 + Math.random() * 2; // 1-3秒
+
+            shootingStar.style.width = `${length}px`;
+            shootingStar.style.left = `${startX}px`;
+            shootingStar.style.top = `${startY}px`;
+            shootingStar.style.transform = `rotate(${angle}deg)`;
+
+            // 设置动画
+            shootingStar.style.animation = `shooting-star ${duration}s linear forwards`;
+
+            document.body.appendChild(shootingStar);
+            shootingStars.push(shootingStar);
+
+            // 更新流星计数
+            meteorCountElement.textContent = shootingStars.length;
+
+            // 动画结束后移除元素
+            setTimeout(() => {
+                if (shootingStar.parentNode) {
+                    shootingStar.parentNode.removeChild(shootingStar);
+                    const index = shootingStars.indexOf(shootingStar);
+                    if (index > -1) {
+                        shootingStars.splice(index, 1);
+                        meteorCountElement.textContent = shootingStars.length;
+                    }
+                }
+            }, duration * 1000);
+        }
+
+        // 开始流星循环
+        function startMeteorShower() {
+            if (!meteorsActive) return;
+
+            // 根据频率计算延迟
+            const delay = (60 / meteorFrequency) * 1000;
+
+            // 随机延迟，增加自然感
+            const randomDelay = delay * 0.5 + Math.random() * delay;
+
+            setTimeout(() => {
+                createShootingStar();
+                startMeteorShower();
+            }, randomDelay);
+        }
+
+        // 更新所有星星的动画速度
+        function updateAllStarsSpeed() {
+            stars.forEach(star => {
+                updateStarAnimationSpeed(star);
+            });
+        }
+
+        // 更新星系可见性
+        function updateGalaxyVisibility() {
+            const galaxies = document.querySelectorAll('.galaxy');
+            const isVisible = galaxyToggle.checked;
+
+            galaxies.forEach(galaxy => {
+                galaxy.style.display = isVisible ? 'block' : 'none';
+            });
+
+            galaxyStatus.textContent = isVisible ? '开启' : '关闭';
+        }
+
+        // 更新行星可见性
+        function updatePlanetVisibility() {
+            const planets = document.querySelectorAll('.planet');
+            const isVisible = planetToggle.checked;
+
+            planets.forEach(planet => {
+                planet.style.display = isVisible ? 'block' : 'none';
+            });
+
+            planetStatus.textContent = isVisible ? '开启' : '关闭';
+        }
+
+        // 重置星空
+        function resetStarfield() {
+            // 清除所有流星
+            shootingStars.forEach(star => {
+                if (star.parentNode) {
+                    star.parentNode.removeChild(star);
+                }
+            });
+            shootingStars = [];
+
+            // 重置星星
+            initStars();
+
+            // 重置流星计数
+            meteorCountElement.textContent = '0';
+
+            // 重新开始流星雨
+            startMeteorShower();
+        }
+
+        // 点击添加自定义星星
+        document.addEventListener('click', function (e) {
+            // 创建大星星
+            const star = document.createElement('div');
+            star.className = 'star large';
+
+            // 设置位置为点击位置
+            star.style.left = `${e.clientX}px`;
+            star.style.top = `${e.clientY}px`;
+
+            // 随机颜色
+            const colors = ['#3498db', '#9b59b6', '#e74c3c', '#f1c40f', '#1abc9c'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            star.style.backgroundColor = randomColor;
+            star.style.boxShadow = `0 0 15px 3px ${randomColor}`;
+
+            // 添加特殊动画
+            star.style.animation = `twinkle-large ${2 + Math.random() * 3}s infinite alternate`;
+
+            document.body.appendChild(star);
+            stars.push(star);
+
+            // 5秒后移除
+            setTimeout(() => {
+                if (star.parentNode) {
+                    star.parentNode.removeChild(star);
+                    const index = stars.indexOf(star);
+                    if (index > -1) {
+                        stars.splice(index, 1);
+                    }
+                }
+            }, 5000);
+
+            // 更新星星计数
+            starCountElement.textContent = parseInt(starCountElement.textContent) + 1;
+        });
+
+        // 事件监听
+        starDensitySlider.addEventListener('input', function () {
+            starDensity = parseInt(this.value);
+            densityValue.textContent = starDensity;
+            initStars();
+        });
+
+        meteorFrequencySlider.addEventListener('input', function () {
+            meteorFrequency = parseInt(this.value);
+            frequencyValue.textContent = meteorFrequency;
+
+            // 重新开始流星雨
+            meteorsActive = false;
+            setTimeout(() => {
+                meteorsActive = true;
+                startMeteorShower();
+            }, 100);
+        });
+
+        twinkleSpeedSlider.addEventListener('input', function () {
+            twinkleSpeed = parseInt(this.value);
+            speedValue.textContent = twinkleSpeed;
+            updateAllStarsSpeed();
+        });
+
+        galaxyToggle.addEventListener('change', updateGalaxyVisibility);
+        planetToggle.addEventListener('change', updatePlanetVisibility);
+
+        resetBtn.addEventListener('click', resetStarfield);
+
+        // 初始化
+        window.addEventListener('load', function () {
+            initStars();
+            startMeteorShower();
+            updateGalaxyVisibility();
+            updatePlanetVisibility();
+        });
+
+        // 窗口大小变化时重新初始化星星位置
+        window.addEventListener('resize', function () {
+            // 不需要重新创建星星，只需调整现有星星的位置
+            // 这里可以添加更复杂的响应式处理
+        });
+    </script>
+</body>
+
+</html>

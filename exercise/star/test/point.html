@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas圆点测试</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            background: black;
+        }
+
+        canvas {
+            display: block;
+            background: black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.arc(100, 100, 20, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+    </script>
+</body>
+
+</html>

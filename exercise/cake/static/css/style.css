@@ -1,0 +1,119 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    min-width: 100%;
+}
+
+body {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'Gloria Hallelujah', 'Microsoft YaHei', cursive;
+    background: linear-gradient(#eb6383 25%, #fa9191 25% 50%, #ffe9c5 50% 75%, #b4f2e1 75%);
+}
+
+h1 {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    font-size: clamp(2.8rem, 6vw, 7rem);
+    line-height: 1.2;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 2px #eb6383;
+    letter-spacing: 0.04em;
+}
+
+.word,
+.char {
+    display: inline-block;
+}
+
+.word {
+    white-space: nowrap;
+    margin-right: 0.18em;
+}
+
+[data-word="🎂"] .char {
+    display: inline;
+}
+
+.splitting .char,
+.char {
+    opacity: 0;
+    transform: scale(2) rotate(60deg);
+    animation: slide-in 1s cubic-bezier(0.17, 0.84, 0.4, 1.49) both;
+    animation-delay: calc(35ms * var(--char-index, 0));
+}
+
+[data-word="🎂"] {
+    display: inline-block;
+    animation: bump-in 1s cubic-bezier(0.17, 0.84, 0.4, 1.49) both;
+    animation-delay: 1s;
+}
+
+particule {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 1px 1px 6px rgba(235, 99, 131, 0.8);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: burst 1.6s ease-in forwards;
+}
+
+@keyframes slide-in {
+    0% {
+        opacity: 0;
+        transform: scale(2) rotate(60deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes bump-in {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes burst {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(1.2);
+    }
+}

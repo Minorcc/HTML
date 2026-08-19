@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>烟花时钟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0f1f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            overflow: hidden;
+        }
+
+        #fireworks-demo {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            display: block;
+            background: transparent;
+        }
+
+        #fireworks-play-btn {
+            position: fixed;
+            left: 24px;
+            bottom: 24px;
+            z-index: 20;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            padding: 0.8rem 1.2rem;
+            color: #edf6ff;
+            background: linear-gradient(135deg, rgba(66, 132, 255, 0.45), rgba(202, 99, 255, 0.42));
+            box-shadow: 0 12px 24px rgba(72, 108, 255, 0.26);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            cursor: pointer;
+            font-size: 0.88rem;
+            letter-spacing: 0.12em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            user-select: none;
+        }
+
+        #fireworks-play-btn:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 16px 28px rgba(96, 128, 255, 0.3);
+        }
+
+        #fireworks-play-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .star.large {
+            width: 4px;
+            height: 4px;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: twinkle-large 5s infinite alternate;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+            animation: twinkle-medium 4s infinite alternate;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+            box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.4);
+            animation: twinkle-small 3s infinite alternate;
+        }
+
+        @keyframes twinkle-large {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+
+            20% {
+                opacity: 0.7;
+                transform: scale(1.2);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.7);
+            }
+
+            75% {
+                opacity: 0.8;
+                transform: scale(1.3);
+            }
+        }
+
+        @keyframes twinkle-medium {
+
+            0%,
+            100% {
+                opacity: 0.1;
+                transform: scale(1);
+            }
+
+            25% {
+                opacity: 0.4;
+                transform: scale(1.2);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.9);
+            }
+
+            80% {
+                opacity: 0.5;
+                transform: scale(1.3);
+            }
+        }
+
+        @keyframes twinkle-small {
+
+            0%,
+            100% {
+                opacity: 0.05;
+                transform: scale(1);
+            }
+
+            30% {
+                opacity: 0.5;
+                transform: scale(1.4);
+            }
+
+            50% {
+                opacity: 0.95;
+                transform: scale(2.1);
+            }
+
+            70% {
+                opacity: 0.35;
+                transform: scale(1.3);
+            }
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            width: min(460px, 80vw);
+            padding: 1.8rem 1.5rem 1.2rem;
+            background: rgba(10, 14, 30, 0.58);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+            color: #f0f4ff;
+            text-align: center;
+        }
+
+        .calendar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            color: #eaf3ff;
+        }
+
+        .year {
+            font-size: 1.5rem;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            color: #dfeeff;
+            text-shadow: 0 0 12px rgba(139, 179, 255, 0.7);
+        }
+
+        .date-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            font-weight: 700;
+            font-size: 2.3rem;
+            letter-spacing: 0.12em;
+            line-height: 1;
+            color: #f5f9ff;
+        }
+
+        .date-block {
+            position: relative;
+            min-width: 110px;
+            padding: 0.7rem 0.8rem;
+            border-radius: 0.9rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.04);
+            perspective: 800px;
+            overflow: hidden;
+        }
+
+        .date-block .face {
+            display: block;
+            transform-origin: center bottom;
+            transition: transform 0.55s ease, opacity 0.55s ease;
+            backface-visibility: hidden;
+        }
+
+        .date-block.flip .face {
+            animation: flipUp 0.55s ease forwards;
+        }
+
+        @keyframes flipUp {
+            0% {
+                transform: rotateX(0deg) translateY(0);
+                opacity: 1;
+            }
+
+            45% {
+                transform: rotateX(90deg) translateY(0);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: rotateX(0deg) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .date-divider {
+            font-size: 2rem;
+            opacity: 0.6;
+            color: #c3d4ff;
+        }
+
+        .lunar-date {
+            margin-top: 0.2rem;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            color: #dfeaff;
+            font-weight: 500;
+            opacity: 0.9;
+            min-height: 1.2em;
+        }
+
+        .time {
+            margin-top: 0.2rem;
+            font-size: 1.1rem;
+            letter-spacing: 0.25em;
+            color: #bfd1ff;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                width: min(86vw, 360px);
+                padding: 1.3rem 1rem 1rem;
+                border-radius: 1.5rem;
+            }
+
+            .year {
+                font-size: 1.1rem;
+            }
+
+            .date-row {
+                font-size: 1.7rem;
+                gap: 0.25rem;
+            }
+
+            .date-block {
+                min-width: 82px;
+                padding: 0.5rem 0.3rem;
+            }
+
+            .time {
+                letter-spacing: 0.15em;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="fireworks-demo"></canvas>
+
+    <div id="starfield"></div>
+
+    <div class="content">
+        <div class="calendar">
+            <div class="year" id="year">----</div>
+            <div class="date-row">
+                <div class="date-block" id="month-block">
+                    <span class="face" id="month">--</span>
+                </div>
+                <span class="date-divider">/</span>
+                <div class="date-block" id="day-block">
+                    <span class="face" id="day">--</span>
+                </div>
+            </div>
+            <div class="lunar-date" id="lunar-date"></div>
+            <div class="time" id="time">--:--:--</div>
+        </div>
+    </div>
+
+    <button id="fireworks-play-btn">✦ 烟花</button>
+
+    <script>
+        // ==================== 烟花模块 ====================
+        (function () {
+            const canvas = document.getElementById('fireworks-demo');
+            const playButton = document.getElementById('fireworks-play-btn');
+
+            if (!canvas) {
+                console.warn('fireworks-demo canvas not found');
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let lastTriggeredHour = null;
+
+            function resizeCanvas() {
+                const ratio = window.devicePixelRatio || 1;
+                canvas.width = window.innerWidth * ratio;
+                canvas.height = window.innerHeight * ratio;
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
+                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+            }
+
+            function random(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function hexToRgba(hex, alpha) {
+                const clean = hex.replace('#', '');
+                const value = clean.length === 3 ?
+                    clean.split('').map(ch => ch + ch).join('') :
+                    clean;
+                const num = Number.parseInt(value, 16);
+                const r = (num >> 16) & 255;
+                const g = (num >> 8) & 255;
+                const b = num & 255;
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+
+            // ---------- 三种烟花，保持饱满 ----------
+            function createGhostBurst(x, y) {
+                const colors = ['#8ecae6', '#bdb2ff', '#ffffff', '#a0f0ff', '#c7f9cc'];
+                const count = 75;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 * i) / count + random(-0.3, 0.3);
+                    const speed = random(0.8, 4.0);
+                    particles.push({
+                        x,
+                        y,
+                        prevX: x,
+                        prevY: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 0.4,
+                        life: random(55, 130),
+                        maxLife: 130,
+                        size: random(2.5, 5.5),
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        alpha: 0.25,
+                        gravity: 0.018,
+                        type: 'ghost',
+                        twinkle: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function createStrobeBurst(x, y) {
+                const colors = ['#ffffff', '#ffd166', '#8ecae6', '#ff7b7b', '#bdb2ff', '#ff9ff3'];
+                const count = 80;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 * i) / count + random(-0.1, 0.1);
+                    const speed = random(2.0, 7.5);
+                    particles.push({
+                        x,
+                        y,
+                        prevX: x,
+                        prevY: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: random(24, 50),
+                        maxLife: 50,
+                        size: random(2.5, 5.0),
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        alpha: 1,
+                        gravity: 0.11,
+                        type: 'strobe',
+                        twinkle: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function createHorsetailBurst(x, y) {
+                const colors = ['#8ecae6', '#ffd166', '#bdb2ff', '#ffffff', '#ff7b7b', '#7bed9f'];
+                const mainColor = colors[Math.floor(Math.random() * colors.length)];
+                const count1 = 55;
+                const count2 = 50;
+
+                for (let i = 0; i < count1; i++) {
+                    particles.push({
+                        x: x + random(-16, 16),
+                        y: y + random(6, 28),
+                        prevX: x,
+                        prevY: y,
+                        vx: random(-2.5, 2.5),
+                        vy: random(-9.0, -4.5),
+                        life: random(38, 76),
+                        maxLife: 76,
+                        size: random(2.5, 5.5),
+                        color: mainColor,
+                        alpha: 1,
+                        gravity: 0.045,
+                        type: 'horsetail',
+                        trail: 0.85
+                    });
+                }
+
+                // 第二圈更亮的核心
+                for (let i = 0; i < count2; i++) {
+                    const angle = (Math.PI * 2 * i) / count2 + random(-0.08, 0.08);
+                    const speed = random(1.8, 6.2);
+                    particles.push({
+                        x,
+                        y,
+                        prevX: x,
+                        prevY: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 0.7,
+                        life: random(40, 70),
+                        maxLife: 70,
+                        size: random(2.0, 4.2),
+                        color: mainColor,
+                        alpha: 1,
+                        gravity: 0.075,
+                        type: 'horsetail'
+                    });
+                }
+            }
+
+            function shuffleArray(arr) {
+                const list = [...arr];
+                for (let i = list.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [list[i], list[j]] = [list[j], list[i]];
+                }
+                return list;
+            }
+
+            function triggerSequence() {
+                particles = [];
+                const sequence = shuffleArray(['ghost', 'strobe', 'horsetail']);
+                let index = 0;
+
+                function launchNext() {
+                    if (index >= sequence.length) return;
+
+                    const type = sequence[index];
+                    const x = random(window.innerWidth * 0.15, window.innerWidth * 0.85);
+                    const y = random(window.innerHeight * 0.15, window.innerHeight * 0.7);
+
+                    if (type === 'ghost') {
+                        createGhostBurst(x, y);
+                    } else if (type === 'strobe') {
+                        createStrobeBurst(x, y);
+                    } else {
+                        createHorsetailBurst(x, y);
+                    }
+
+                    index += 1;
+                    if (index < sequence.length) {
+                        setTimeout(launchNext, 400);
+                    }
+                }
+
+                launchNext();
+            }
+
+            function checkAutoPlayByHour() {
+                const now = new Date();
+                const hour = now.getHours();
+                const minute = now.getMinutes();
+                const second = now.getSeconds();
+
+                if (minute === 0 && second === 0 && lastTriggeredHour !== hour) {
+                    lastTriggeredHour = hour;
+                    triggerSequence();
+                }
+
+                if (minute !== 0 || second !== 0) {
+                    lastTriggeredHour = null;
+                }
+            }
+
+            function updateParticles() {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.prevX = p.x;
+                    p.prevY = p.y;
+                    p.vy += p.gravity;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 1;
+
+                    if (p.type === 'ghost') {
+                        const ratio = p.life / p.maxLife;
+                        p.alpha = Math.max(0.05, ratio * 0.7 + 0.2 + Math.sin(p.twinkle + p.life * 0.1) * 0.1);
+                    } else if (p.type === 'strobe') {
+                        const phase = Math.floor((p.maxLife - p.life) / 4) % 3;
+                        p.alpha = phase === 0 || phase === 2 ? 1 : 0.15;
+                    } else if (p.type === 'horsetail') {
+                        p.alpha = Math.max(0, (p.life / p.maxLife) * 0.92 + 0.08);
+                    } else {
+                        p.alpha = Math.max(0, p.life / p.maxLife);
+                    }
+
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+            }
+
+            function renderParticles() {
+                // 深色拖尾，保留清晰度
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = 'rgba(11, 15, 31, 0.3)';
+                ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+                // 绘制所有粒子
+                for (const p of particles) {
+                    if (p.type === 'horsetail') {
+                        // 拖尾线
+                        ctx.beginPath();
+                        ctx.moveTo(p.prevX, p.prevY);
+                        ctx.lineTo(p.x, p.y);
+                        ctx.strokeStyle = hexToRgba(p.color, Math.max(0.2, p.alpha * 0.85));
+                        ctx.lineWidth = Math.max(1.5, p.size * 0.85);
+                        ctx.shadowBlur = 6;
+                        ctx.shadowColor = p.color;
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+
+                        // 头部光点
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size * 0.7, 0, Math.PI * 2);
+                        ctx.fillStyle = hexToRgba('#ffffff', p.alpha * 0.6);
+                        ctx.fill();
+                        continue;
+                    }
+
+                    // 主粒子
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = hexToRgba(p.color, p.alpha);
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Ghost 光晕（柔和）
+                    if (p.type === 'ghost') {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size * 1.8, 0, Math.PI * 2);
+                        ctx.fillStyle = hexToRgba(p.color, p.alpha * 0.12);
+                        ctx.fill();
+
+                        // 更小的核心亮点
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
+                        ctx.fillStyle = hexToRgba('#ffffff', p.alpha * 0.5);
+                        ctx.fill();
+                    }
+
+                    // Strobe 闪烁光晕
+                    if (p.type === 'strobe' && p.alpha > 0.5) {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size * 2.0, 0, Math.PI * 2);
+                        ctx.fillStyle = hexToRgba(p.color, p.alpha * 0.2);
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
+                        ctx.fillStyle = hexToRgba('#ffffff', p.alpha * 0.7);
+                        ctx.fill();
+                    }
+                }
+
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.shadowBlur = 0;
+            }
+
+            function loop() {
+                checkAutoPlayByHour();
+                updateParticles();
+                renderParticles();
+                requestAnimationFrame(loop);
+            }
+
+            if (playButton) {
+                playButton.addEventListener('click', () => triggerSequence());
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            requestAnimationFrame(loop);
+        })();
+
+        // ==================== 时钟 + 星空模块 ====================
+        (function () {
+            const starfield = document.getElementById('starfield');
+            let lastMinuteKey = null;
+
+            function createStar(type) {
+                const star = document.createElement('span');
+                star.className = 'star ' + type;
+
+                const left = Math.random() * window.innerWidth;
+                const top = Math.random() * window.innerHeight;
+                star.style.left = left + 'px';
+                star.style.top = top + 'px';
+                star.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+                star.style.animationDuration = (1.2 + Math.random() * 6).toFixed(2) + 's';
+                star.style.opacity = (Math.random() * 0.9 + 0.1).toFixed(2);
+
+                const dx = (Math.random() - 0.5) * 30;
+                const dy = (Math.random() - 0.5) * 30;
+                const duration = 5 + Math.random() * 12;
+                star.animate(
+                    [
+                        { transform: 'translate(0, 0)' },
+                        { transform: `translate(${dx}px, ${dy}px)` },
+                        { transform: 'translate(0, 0)' }
+                    ], {
+                    duration: duration * 1000,
+                    iterations: Infinity,
+                    easing: 'ease-in-out'
+                }
+                );
+
+                return star;
+            }
+
+            function initStars() {
+                starfield.innerHTML = '';
+                const largeCount = 40;
+                const mediumCount = 60;
+                const smallCount = 90;
+
+                for (let i = 0; i < largeCount; i++) {
+                    starfield.appendChild(createStar('large'));
+                }
+                for (let i = 0; i < mediumCount; i++) {
+                    starfield.appendChild(createStar('medium'));
+                }
+                for (let i = 0; i < smallCount; i++) {
+                    starfield.appendChild(createStar('small'));
+                }
+            }
+
+            function animateFlip(targetEl) {
+                if (!targetEl) return;
+                targetEl.classList.remove('flip');
+                void targetEl.offsetWidth;
+                targetEl.classList.add('flip');
+                setTimeout(() => targetEl.classList.remove('flip'), 600);
+            }
+
+            function getDaysInMonth(year, month) {
+                return new Date(year, month + 1, 0).getDate();
+            }
+
+            function getLunarYearText(year) {
+                const gan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+                const zhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+                const animals = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+                return `${gan[(year - 4) % 10]}${zhi[(year - 4) % 12]}${animals[(year - 4) % 12]}年`;
+            }
+
+            function getLunarDayText(day) {
+                const lunarDays = [
+                    '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+                    '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+                    '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
+                ];
+                return lunarDays[Math.max(0, Math.min(day - 1, lunarDays.length - 1))];
+            }
+
+            function getLunarMonthText(month) {
+                const monthNames = ['正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+                return monthNames[Math.max(0, Math.min(month - 1, monthNames.length - 1))];
+            }
+
+            function updateLunarDate() {
+                const now = new Date();
+                const formatter = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const parts = formatter.formatToParts(now);
+                const lunarYear = Number(parts.find(part => part.type === 'relatedYear' || part.type === 'year')?.value ||
+                    now.getFullYear());
+                const lunarMonth = parts.find(part => part.type === 'month')?.value || getLunarMonthText(now.getMonth() + 1);
+                const lunarDay = Number(parts.find(part => part.type === 'day')?.value || now.getDate());
+
+                const lunarText = `${lunarYear} ${getLunarYearText(lunarYear)} ${lunarMonth}${getLunarDayText(lunarDay)}`;
+                document.getElementById('lunar-date').textContent = lunarText;
+            }
+
+            function updateDateTime() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+
+                document.getElementById('year').textContent = year;
+                const monthEl = document.getElementById('month');
+                const dayEl = document.getElementById('day');
+                const dayValue = Number(day);
+                const monthValue = Number(month);
+
+                const prevDay = Number(dayEl.textContent || now.getDate());
+                const prevMonth = Number(monthEl.textContent || now.getMonth() + 1);
+
+                if (dayValue === getDaysInMonth(year, now.getMonth()) && dayValue === 1) {
+                    const monthBlock = monthEl.closest('.date-block');
+                    animateFlip(monthBlock);
+                }
+
+                if (dayValue !== prevDay) {
+                    const dayBlock = dayEl.closest('.date-block');
+                    animateFlip(dayBlock);
+                }
+
+                if (monthValue !== prevMonth && dayValue === getDaysInMonth(year, now.getMonth())) {
+                    const monthBlock = monthEl.closest('.date-block');
+                    animateFlip(monthBlock);
+                }
+
+                monthEl.textContent = month;
+                dayEl.textContent = day;
+                document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+                updateLunarDate();
+            }
+
+            initStars();
+            updateDateTime();
+
+            setInterval(() => {
+                const now = new Date();
+                const dayEl = document.getElementById('day');
+                const monthEl = document.getElementById('month');
+                const prevDay = Number(dayEl.textContent || now.getDate());
+                const prevMonth = Number(monthEl.textContent || now.getMonth() + 1);
+                const newDay = now.getDate();
+                const newMonth = now.getMonth() + 1;
+                const currentMinuteKey = now.getHours() * 60 + now.getMinutes();
+
+                if (lastMinuteKey !== null && currentMinuteKey !== lastMinuteKey) {
+                    lastMinuteKey = currentMinuteKey;
+                }
+                lastMinuteKey = currentMinuteKey;
+
+                if (newDay !== prevDay) {
+                    animateFlip(dayEl.closest('.date-block'));
+                }
+
+                if (newMonth !== prevMonth && newDay === getDaysInMonth(now.getFullYear(), now.getMonth())) {
+                    animateFlip(monthEl.closest('.date-block'));
+                }
+
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+
+                document.getElementById('year').textContent = now.getFullYear();
+                monthEl.textContent = String(newMonth).padStart(2, '0');
+                dayEl.textContent = String(newDay).padStart(2, '0');
+                updateLunarDate();
+            }, 1000);
+
+            window.addEventListener('resize', function () {
+                initStars();
+            });
+        })();
+    </script>
+
+</body>
+
+</html>

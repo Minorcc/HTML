@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>星空</title>
+    <link rel="stylesheet" href="static/css/fireworks.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+
+    <!-- 烟花播放按钮：触发一组随机烟花效果 -->
+    <button id="fireworks-play-btn" type="button" aria-label="播放烟花">🎇</button>
+    <!-- 全屏烟花画布，实际粒子由 fireworks.js 绘制 -->
+    <canvas id="fireworks-demo"></canvas>
+    <!-- 星空背景容器，由 script.js 动态生成星星 -->
+    <div id="starfield"></div>
+    <!-- 气球动画容器，生日日期触发时动态填充 -->
+    <div id="balloon-container"></div>
+    <!-- 生日当天显示的顶部标题 -->
+    <div class="page-title" style="display: none;">
+        <span>🎂</span>
+        <span>生</span>
+        <span>日</span>
+        <span>快</span>
+        <span>乐</span>
+        <span>🎂</span>
+    </div>
+
+    <div class="content">
+        <!-- 页面主标题：每个字符独立上下浮动形成波浪 -->
+        <div class="wave-title">
+            <span>🍟</span>
+            <span>薯</span>
+            <span>条</span>
+            <span>大</span>
+            <span>王</span>
+            <span>🍟</span>
+        </div>
+        <!-- 特殊日期提示：根据农历七月初八状态切换内容 -->
+        <div class="special-date-message" id="specialMessage" style="display: none;">
+            <div class="message-content">
+                <span>🎉</span>
+                <span>今</span>
+                <span>天</span>
+                <span>是</span>
+                <span>七</span>
+                <span>月</span>
+                <span>初</span>
+                <span>八</span>
+                <span>🎉</span>
+            </div>
+        </div>
+
+        <!-- 非生日当天显示的日期倒计时提示 -->
+        <div class="countdown-message" id="countdownMessage" style="display: none;">
+            <span>📅 距离七月初八还有 </span>
+            <span id="countdownDays">0</span>
+            <span> 天</span>
+        </div>
+        <div class="calendar">
+            <div id="year" class="year"></div>
+            <div class="date-row">
+                <div class="date-block"><span id="month" class="face"></span></div>
+                <div class="date-divider">/</div>
+                <div class="date-block"><span id="day" class="face"></span></div>
+            </div>
+            <div id="lunar-date" class="lunar-date"></div>
+            <div id="time" class="time"></div>
+            <div class="calendar-controls">
+                <button id="minus-day" class="calendar-btn" type="button" aria-label="减一天">−</button>
+                <button id="plus-day" class="calendar-btn" type="button" aria-label="加一天">＋</button>
+            </div>
+        </div>
+    </div>
+    <!-- 日期功能按钮：显示生日状态或倒计时 -->
+    <button id="checkDateBtn" class="check-btn">
+        <i class="fas fa-calendar-check"></i> 查看七月初八
+    </button>
+    <!-- 左下角音乐播放器：播放控制、进度和歌单都由 script.js 管理 -->
+    <section class="music-player" id="musicPlayer" aria-label="音乐播放器">
+        <audio id="musicAudio" preload="metadata"></audio>
+        <div class="music-player-main">
+            <div class="music-cover" aria-hidden="true">♫</div>
+            <div class="music-track-info">
+                <strong id="musicTitle">生日歌</strong>
+                <span id="musicArtist">星空歌单</span>
+            </div>
+            <button class="music-icon-btn" id="musicToggle" type="button" aria-label="播放音乐" title="播放音乐">▶</button>
+            <button class="music-icon-btn" id="musicPlaylistToggle" type="button" aria-label="展开播放列表"
+                title="播放列表">☷</button>
+        </div>
+        <div class="music-progress-row">
+            <span id="musicCurrentTime">00:00</span>
+            <input id="musicProgress" type="range" min="0" max="100" value="0" aria-label="播放进度">
+            <span id="musicDuration">00:00</span>
+        </div>
+        <!-- 上一首、下一首和播放模式切换 -->
+        <div class="music-controls">
+            <button class="music-control-btn" id="musicPrev" type="button" aria-label="上一首" title="上一首">⏮</button>
+            <button class="music-control-btn" id="musicNext" type="button" aria-label="下一首" title="下一首">⏭</button>
+            <button class="music-control-btn music-mode-btn" id="musicMode" type="button" aria-label="播放模式：单曲循环"
+                title="播放模式：单曲循环">↻</button>
+        </div>
+        <div class="music-playlist" id="musicPlaylist" hidden></div>
+    </section>
+    <script src="static/js/fireworks.js"></script>
+    <script src="static/js/script.js"></script>
+
+</body>
+
+</html>

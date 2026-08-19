@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生日快乐 · 打字机动画修复</title>
+    <style>
+        /* 基础布局保持不变，只调整打字机相关样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b0f1a 0%, #1a1f2f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            padding: 1.5rem;
+        }
+
+        .card {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 3.5rem;
+            padding: 3rem 2rem;
+            box-shadow: 0 25px 45px -10px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 2px;
+            font-size: 1.1rem;
+            color: rgba(255, 215, 150, 0.5);
+            text-transform: uppercase;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px dashed rgba(255, 215, 150, 0.15);
+            padding-bottom: 0.75rem;
+        }
+
+        .demo-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 3.2rem;
+        }
+
+        .demo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .demo-label {
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: rgba(255, 220, 180, 0.3);
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* 所有文字共用基础 */
+        .birthday-text {
+            font-size: clamp(2.4rem, 10vw, 4.4rem);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-align: center;
+            color: #fae3d9;
+            text-shadow: 0 4px 20px rgba(255, 160, 120, 0.15);
+            line-height: 1.3;
+            width: 100%;
+            padding: 0.3rem 0;
+        }
+
+        /* ============================================
+           打字机 —— 修复版 (使用精确的字符数)
+           ============================================ */
+        .typewriter-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .anim-typewriter {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid #ffb08c;
+            /* 关键：steps 步数 = 字符总数（中文+emoji都算1个字符） */
+            animation: typewriter 3s steps(10) 0.3s forwards, blinkCursor 0.8s step-end infinite alternate;
+            width: 0;
+            max-width: fit-content;
+            margin: 0 auto;
+            padding-right: 0.1rem;
+            color: #ffdcc9;
+            text-shadow: 0 0 15px #ff8a5c55;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+        }
+
+        /* “🎂 生日快乐” 共 9 个字符（🎂 + 空格 + 生 + 日 + 快 + 乐） */
+        /* 为了更准确，我们用 JS 动态计算字符数并设置 steps，但这里直接写 9 也可以 */
+        /* 但考虑到可能加前缀，我们改为使用 JS 动态设置，更健壮 */
+        @keyframes typewriter {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        @keyframes blinkCursor {
+
+            0%,
+            50% {
+                border-color: #ffb08c;
+            }
+
+            50.1%,
+            100% {
+                border-color: transparent;
+            }
+        }
+
+        /* 其他动画（保留） */
+        .anim-breathe {
+            animation: breatheGlow 2.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes breatheGlow {
+            0% {
+                opacity: 0.7;
+                text-shadow: 0 0 5px #ffb07c, 0 0 15px #ff8a5c, 0 0 30px #ff6a3d;
+                color: #ffe1d0;
+                transform: scale(0.98);
+            }
+
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 12px #ffbb8f, 0 0 35px #ff8f61, 0 0 70px #ff5e2e;
+                color: #fff5ed;
+                transform: scale(1.02);
+            }
+        }
+
+        .anim-bounce span {
+            display: inline-block;
+            animation: bounceLetter 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
+            animation-delay: calc(0.08s * var(--i, 0));
+            transform-origin: center bottom;
+            text-shadow: 0 2px 10px rgba(255, 140, 80, 0.3);
+        }
+
+        @keyframes bounceLetter {
+            0% {
+                transform: translateY(0) scale(0.9);
+                color: #ffdcc9;
+                text-shadow: 0 0 5px #ffaf8a;
+            }
+
+            100% {
+                transform: translateY(-0.25em) scale(1.05);
+                color: #fff0e5;
+                text-shadow: 0 8px 25px #ff8040;
+            }
+        }
+
+        .anim-flow {
+            background: linear-gradient(135deg, #fbc2a0, #f7a07a, #f5b08a, #fccfaf);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: flowGradient 4s ease-in-out infinite alternate;
+            font-weight: 800;
+            text-shadow: none;
+            letter-spacing: 0.06em;
+        }
+
+        @keyframes flowGradient {
+            0% {
+                background-position: 0% 50%;
+                transform: translateX(-4px) scale(1);
+                filter: drop-shadow(0 4px 12px rgba(255, 130, 70, 0.2));
+            }
+
+            50% {
+                transform: translateX(4px) scale(1.02);
+                filter: drop-shadow(0 8px 25px rgba(255, 100, 40, 0.4));
+            }
+
+            100% {
+                background-position: 100% 50%;
+                transform: translateX(-2px) scale(0.99);
+                filter: drop-shadow(0 6px 20px rgba(255, 150, 80, 0.3));
+            }
+        }
+
+        .anim-wave {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.02em;
+        }
+
+        .anim-wave span {
+            display: inline-block;
+            animation: waveFloat 2.2s ease-in-out infinite alternate;
+            animation-delay: calc(0.09s * var(--i, 0));
+            color: #fad5c5;
+            text-shadow: 0 0 20px #ffa07a55;
+            font-weight: 700;
+            transform-origin: center;
+        }
+
+        @keyframes waveFloat {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+                color: #fad5c5;
+                text-shadow: 0 2px 8px #ffa07a55;
+            }
+
+            100% {
+                transform: translateY(-12px) rotate(2deg);
+                color: #ffe8dd;
+                text-shadow: 0 12px 30px #ff8248;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 2rem 1rem;
+                border-radius: 2.5rem;
+            }
+
+            .birthday-text {
+                font-size: clamp(2rem, 14vw, 3rem);
+            }
+        }
+
+        .demo-item .birthday-text {
+            transition: text-shadow 0.3s;
+        }
+
+        .demo-item:hover .birthday-text {
+            text-shadow: 0 0 30px rgba(255, 180, 130, 0.3);
+        }
+
+        .footer-note {
+            margin-top: 3rem;
+            text-align: center;
+            color: rgba(255, 200, 170, 0.15);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            border-top: 1px solid rgba(255, 200, 170, 0.05);
+            padding-top: 2rem;
+            font-weight: 300;
+        }
+
+        .footer-note span {
+            color: rgba(255, 180, 150, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>✨ 生日快乐 · 打字机修复 ✨</h2>
+
+        <div class="demo-grid">
+
+            <!-- 1. 霓虹呼吸 -->
+            <div class="demo-item">
+                <div class="demo-label">✦ 霓虹呼吸</div>
+                <div class="birthday-text anim-breathe">🎂 生日快乐</div>
+            </div>
+
+            <!-- 2. 逐字弹跳 -->
+            <div class="demo-item">
+                <div class="demo-label">✦ 逐字弹跳</div>
+                <div class="birthday-text anim-bounce">
+                    <span style="--i:0;">生</span>
+                    <span style="--i:1;">日</span>
+                    <span style="--i:2;">快</span>
+                    <span style="--i:3;">乐</span>
+                    <span style="--i:4;">🎈</span>
+                </div>
+            </div>
+
+            <!-- 3. 色彩流动 -->
+            <div class="demo-item">
+                <div class="demo-label">✦ 色彩流动</div>
+                <div class="birthday-text anim-flow">🌈 生日快乐</div>
+            </div>
+
+            <!-- 4. 打字机 + 闪烁光标（修复版） -->
+            <div class="demo-item">
+                <div class="demo-label">✦ 打字机</div>
+                <div class="typewriter-wrapper">
+                    <div class="birthday-text anim-typewriter" id="typewriterText">🎂 生日快乐</div>
+                </div>
+            </div>
+
+            <!-- 5. 波浪摇曳 -->
+            <div class="demo-item">
+                <div class="demo-label">✦ 波浪摇曳</div>
+                <div class="birthday-text anim-wave">
+                    <span style="--i:0;">✨</span>
+                    <span style="--i:1;">生</span>
+                    <span style="--i:2;">日</span>
+                    <span style="--i:3;">快</span>
+                    <span style="--i:4;">乐</span>
+                    <span style="--i:5;">✨</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            <span>❤️ 打字机已修复 · 文字完整显示 ❤️</span>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // 动态修复打字机：根据实际文字长度设置 steps
+            const typeEl = document.getElementById('typewriterText');
+            if (typeEl) {
+                // 获取原始文本内容（去除可能的多余空格，但保留内部空格）
+                const rawText = typeEl.textContent || '🎂 生日快乐';
+                // 计算字符数（中文、emoji、空格都算1个字符）
+                const charCount = [...rawText].length;
+                // 动态修改 animation 的 steps 值
+                // 由于 animation 简写中 steps 是第一个参数，我们重新设置
+                // 更稳健：直接修改 keyframes 的 width 到 100%，并设置 steps 在 animation 中
+                // 但更好的方式是直接覆盖 animation 属性
+                typeEl.style.animation = `typewriter 3s steps(${charCount}) 0.3s forwards, blinkCursor 0.8s step-end infinite alternate`;
+                console.log(`✅ 打字机字符数: ${charCount} (文本: "${rawText}")`);
+            }
+        })();
+    </script>
+
+</body>
+
+</html>
